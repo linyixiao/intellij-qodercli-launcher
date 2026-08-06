@@ -1,0 +1,15 @@
+# Build output
+build/
+out/
+.gradle/
+
+# IntelliJ Platform Gradle Plugin caches / sandbox (not part of the source)
+.intellijPlatform/
+
+# IDE / project metadata
+.idea/
+*.iml
+
+# OS junk
+.DS_Store
+**/.DS_Store
