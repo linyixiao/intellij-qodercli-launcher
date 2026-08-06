@@ -1,0 +1,64 @@
+<idea-plugin>
+    <id>dev.linzhang.qodercli-launcher</id>
+    <name>Qoder CLI Launcher</name>
+    <version>1.0.0</version>
+    <vendor email="linzhang66666666@gmail.com"
+            url="https://github.com/linyixiao/intellij-qodercli-launcher">Lin Zhang</vendor>
+
+    <idea-version since-build="242"/>
+
+    <description><![CDATA[
+        <b>Qoder CLI Launcher</b> adds a toolbar button that opens a terminal tab named
+        "Qoder CLI" in the current file's directory and runs the Qoder CLI
+        (<code>qodercli</code>). After the CLI exits, the tab drops back to an interactive
+        shell so it stays open for further use. Works on macOS, Linux and Windows.
+        <br/><br/>
+        <b>Prerequisites</b>
+        <ul>
+            <li>The Qoder CLI (<code>qodercli</code>) must be installed and available on your
+                <code>PATH</code> (the plugin only launches it, it does not bundle it).</li>
+            <li>An IntelliJ-based IDE with the bundled <b>Terminal</b> plugin enabled.</li>
+            <li>IDE version <b>2024.2 (build 242)</b> or newer.</li>
+        </ul>
+        <br/>
+        This is an independent helper that launches the separately installed Qoder CLI.
+        <hr/>
+        <b>Qoder CLI Launcher</b> 会在工具栏添加一个按钮：在当前文件所在目录打开一个名为
+        “Qoder CLI” 的终端标签页并运行 Qoder CLI（<code>qodercli</code>）。命令结束后会回落到
+        交互式 shell，标签页保持打开以便继续使用。支持 macOS、Linux 和 Windows。
+        <br/><br/>
+        <b>使用前提</b>
+        <ul>
+            <li>已安装 Qoder CLI（<code>qodercli</code>），且其在系统 <code>PATH</code> 中可直接调用
+                （本插件只负责启动，不内置 CLI 本体）。</li>
+            <li>基于 IntelliJ 的 IDE，并已启用内置的 <b>Terminal</b> 插件。</li>
+            <li>IDE 版本为 <b>2024.2（build 242）</b> 或更高。</li>
+        </ul>
+        <br/>
+        本插件是一个独立的辅助工具，用于启动你单独安装好的 Qoder CLI。
+    ]]></description>
+
+    <change-notes><![CDATA[
+        <b>1.0.0</b>
+        <ul>
+            <li>Initial release: one-click launch of the Qoder CLI in the IDE's embedded terminal,
+                cross-platform (macOS / Linux / Windows).</li>
+        </ul>
+        首个版本：一键在 IDE 内置终端启动 Qoder CLI，支持 macOS / Linux / Windows。
+    ]]></change-notes>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.terminal</depends>
+
+    <actions>
+        <action id="LaunchQoderCli"
+                class="dev.linzhang.qodercli.LaunchQoderCliAction"
+                text="Launch Qoder CLI"
+                description="Open a terminal in the current directory and start the Qoder CLI (qodercli)"
+                icon="/icons/launchQoderCli.png">
+            <!-- New UI main toolbar; absent in the Classic UI, hence the Tools menu fallback. -->
+            <add-to-group group-id="MainToolbarRight" anchor="last"/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
