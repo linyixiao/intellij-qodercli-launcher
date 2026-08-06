@@ -19,7 +19,8 @@ CLI — it does not bundle the CLI itself.
 
 - The Qoder CLI (`qodercli`) must be installed and available on your `PATH`.
 - An IntelliJ-based IDE with the bundled **Terminal** plugin enabled.
-- IDE version **2024.2 (build 242)** or newer.
+- IDE version **2025.1 (build 251)** or newer — the terminal API used to launch a
+  custom command is not available in earlier builds.
 
 ## Build
 
@@ -73,7 +74,7 @@ macOS、Linux 和 Windows。
 
 - 已安装 Qoder CLI（`qodercli`），且其在系统 `PATH` 中可直接调用。
 - 基于 IntelliJ 的 IDE，并已启用内置的 **Terminal** 插件。
-- IDE 版本为 **2024.2（build 242）** 或更高。
+- IDE 版本为 **2025.1（build 251）** 或更高——用于启动自定义命令的终端 API 在更早版本中不存在。
 
 ## 构建
 

@@ -5,7 +5,7 @@
     <vendor email="linzhang66666666@gmail.com"
             url="https://github.com/linyixiao/intellij-qodercli-launcher">Lin Zhang</vendor>
 
-    <idea-version since-build="242"/>
+    <idea-version since-build="251"/>
 
     <description><![CDATA[
         <b>Qoder CLI Launcher</b> adds a toolbar button that opens a terminal tab named
@@ -18,7 +18,7 @@
             <li>The Qoder CLI (<code>qodercli</code>) must be installed and available on your
                 <code>PATH</code> (the plugin only launches it, it does not bundle it).</li>
             <li>An IntelliJ-based IDE with the bundled <b>Terminal</b> plugin enabled.</li>
-            <li>IDE version <b>2024.2 (build 242)</b> or newer.</li>
+            <li>IDE version <b>2025.1 (build 251)</b> or newer (the terminal API this plugin relies on is not available in earlier builds).</li>
         </ul>
         <br/>
         This is an independent helper that launches the separately installed Qoder CLI.
@@ -32,7 +32,7 @@
             <li>已安装 Qoder CLI（<code>qodercli</code>），且其在系统 <code>PATH</code> 中可直接调用
                 （本插件只负责启动，不内置 CLI 本体）。</li>
             <li>基于 IntelliJ 的 IDE，并已启用内置的 <b>Terminal</b> 插件。</li>
-            <li>IDE 版本为 <b>2024.2（build 242）</b> 或更高。</li>
+            <li>IDE 版本为 <b>2025.1（build 251）</b> 或更高（本插件依赖的终端 API 在更早版本中不存在）。</li>
         </ul>
         <br/>
         本插件是一个独立的辅助工具，用于启动你单独安装好的 Qoder CLI。
