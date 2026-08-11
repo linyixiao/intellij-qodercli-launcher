@@ -8,17 +8,15 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.plugins.terminal.TerminalToolWindowManager;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Opens a new terminal tab in the current file's directory and launches the Qoder CLI
- * ({@code qodercli}). The command is chosen per OS (login+interactive shell on
- * macOS/Linux, PowerShell on Windows) so any user who has {@code qodercli} on their PATH
- * can use it; after the CLI exits the tab drops back to an interactive shell instead of
- * closing.
+ * ({@code qodercli}) with no extra arguments.
+ *
+ * <p>The tab is an ordinary interactive shell and the CLI is typed into it as a command line, which
+ * is what makes this work for everyone: the user's own rc files are loaded, so {@code qodercli} is
+ * resolved from the {@code PATH} (or from a shell function) exactly as in a hand-opened terminal,
+ * and when the CLI exits the tab drops back to the prompt instead of closing.
  */
 public class LaunchQoderCliAction extends AnAction implements DumbAware {
 
@@ -54,44 +52,6 @@ public class LaunchQoderCliAction extends AnAction implements DumbAware {
             return;
         }
 
-        List<String> command = buildCommand();
-
-        TerminalToolWindowManager.getInstance(project)
-                .createNewSession(workingDir, "Qoder CLI", command, true, true);
-    }
-
-    /**
-     * Build the shell invocation that starts {@code qodercli} and then drops back to
-     * an interactive shell (so the tab stays open after the CLI exits). The command is
-     * chosen per OS so the plugin works for any user who has qodercli on their PATH,
-     * not just macOS + zsh.
-     */
-    private static List<String> buildCommand() {
-        String os = System.getProperty("os.name", "").toLowerCase();
-
-        if (os.contains("win")) {
-            // Windows: run via PowerShell, then hand control back to an interactive shell.
-            return Arrays.asList(
-                    "powershell.exe",
-                    "-NoExit",
-                    "-Command",
-                    "qodercli"
-            );
-        }
-
-        // macOS / Linux: use the user's login shell as an interactive login shell so
-        // rc files (PATH, and any qodercli function wrapper) are loaded; exec back into
-        // the same shell after qodercli exits so the tab stays usable.
-        String shell = System.getenv("SHELL");
-        if (shell == null || shell.isEmpty()) {
-            shell = "/bin/bash";
-        }
-        return Arrays.asList(
-                shell,
-                "--login",
-                "-i",
-                "-c",
-                "qodercli; exec \"" + shell + "\" -i"
-        );
+        QoderCliLauncher.launch(project, workingDir, QoderCliLauncher.TAB_NAME, QoderCliLauncher.noArgs());
     }
 }
