@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "dev.linzhang"
-version = "1.0.0"
+version = "1.1.0"
 
 fun firstExistingDir(vararg paths: String): String? = paths.firstOrNull { file(it).isDirectory }
 
@@ -28,8 +28,9 @@ val ideaHome: String = (
 )
 
 // Compile with the IDE's bundled JBR: platform classes are Java 25 bytecode, which an
-// older javac cannot read. Output is pinned to Java 21 so the plugin still loads on
-// every IDE from 2024.2 onwards.
+// older javac cannot read. Output is pinned to Java 21 because the oldest IDE this plugin
+// supports (2025.1, see since-build in plugin.xml) runs on JBR 21 — so the bytecode stays
+// loadable there no matter how new the IDE we happen to compile against is.
 val jbrHome: String = firstExistingDir("$ideaHome/jbr/Contents/Home", "$ideaHome/jbr")
     ?: error("No bundled JBR under $ideaHome — does ideaHome point at an IDE installation?")
 
