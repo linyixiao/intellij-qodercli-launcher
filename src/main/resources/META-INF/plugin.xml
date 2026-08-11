@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>dev.linzhang.qodercli-launcher</id>
     <name>Qoder CLI Launcher</name>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <vendor email="linzhang66666666@gmail.com"
             url="https://github.com/linyixiao/intellij-qodercli-launcher">Lin Zhang</vendor>
 
@@ -12,6 +12,21 @@
         "Qoder CLI" in the current file's directory and runs the Qoder CLI
         (<code>qodercli</code>). After the CLI exits, the tab drops back to an interactive
         shell so it stays open for further use. Works on macOS, Linux and Windows.
+        <br/><br/>
+        You can also right-click a file in the editor or the Project view and open the
+        <b>问 Qoder CLI</b> submenu to pick a task &mdash; 解释 (explain), 审查 (review),
+        写测试 (write tests), 重构 (refactor), 补文档 (add docs), 优化 (optimize), or 自定义…
+        (a free-form question). The chosen file (or selected snippet) is attached as context and the
+        CLI opens in interactive mode, ready for follow-up questions. A 继续当前会话
+        ("continue current session") toggle controls whether tasks continue in the existing terminal
+        session or always start a new one. The menu is in Chinese, matching the Qoder CLI itself.
+        <br/><br/>
+        Where the IDE knows something a terminal agent cannot, the plugin hands it over.
+        <b>修报错</b> (fix the problems) appears in that same submenu whenever the current file or
+        selection carries errors or warnings, and passes the list along. <b>用 Qoder CLI 解释报错</b>
+        sends the selected output of a Run / Debug console &mdash; or its tail &mdash; for diagnosis.
+        <b>让 Qoder CLI review 未提交的改动</b> (Tools menu, or the Local Changes view) names the
+        files you have touched and lets the CLI run <code>git diff</code> itself.
         <br/><br/>
         <b>Prerequisites</b>
         <ul>
@@ -27,6 +42,18 @@
         “Qoder CLI” 的终端标签页并运行 Qoder CLI（<code>qodercli</code>）。命令结束后会回落到
         交互式 shell，标签页保持打开以便继续使用。支持 macOS、Linux 和 Windows。
         <br/><br/>
+        你还可以在编辑器或项目视图中右键某个文件，打开 <b>问 Qoder CLI</b> 子菜单挑选任务
+        &mdash; 解释、审查、写测试、重构、补文档、优化，或“自定义…”自由提问。选中的文件（或选中的代码片段）
+        会作为上下文附件带入，CLI 以交互模式打开，便于继续追问。菜单里的“继续当前会话”开关用于控制
+        任务是在已有终端会话里接着问，还是每次都新开一个会话。每个任务都是独立的 action，可以在
+        Find Action 里搜到，也可以在 Keymap 里绑定快捷键。
+        <br/><br/>
+        凡是只有 IDE 才知道的信息，插件都会替你交给 CLI：当前文件（或选区）里有 error / warning 时，
+        子菜单里会多出 <b>修报错</b>，把问题清单一并带上；在运行 / 调试控制台里右键可用
+        <b>用 Qoder CLI 解释报错</b>，把选中的输出（或末尾若干行）交给 CLI 定位根因；
+        <b>让 Qoder CLI review 未提交的改动</b>（Tools 菜单或 Local Changes 面板）会点名你改过的文件，
+        具体 diff 由 CLI 自己执行 <code>git diff</code> 获取。
+        <br/><br/>
         <b>使用前提</b>
         <ul>
             <li>已安装 Qoder CLI（<code>qodercli</code>），且其在系统 <code>PATH</code> 中可直接调用
@@ -39,6 +66,37 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.1.0</b>
+        <ul>
+            <li><b>问 Qoder CLI</b> context-menu submenu (editor &amp; Project view) with preset tasks
+                &mdash; 解释, 审查, 写测试, 重构, 补文档, 优化 &mdash; plus 自定义… for a free-form
+                question. The file or selected snippet is attached as context and the CLI opens in
+                interactive mode. A 继续当前会话 toggle decides whether a task continues in the
+                running session or starts a fresh one. Every entry is a normal action, so it can be
+                found in Find Action and bound to a shortcut.</li>
+            <li><b>修报错</b>: the same submenu offers a "fix the problems" entry whenever the IDE
+                reports errors or warnings in the current file (or selection), and sends that list to
+                the CLI. It stays hidden when the file is clean.</li>
+            <li><b>用 Qoder CLI 解释报错</b>: right-click inside a Run or Debug console to send the
+                selected output &mdash; or the tail of it &mdash; to the CLI for diagnosis. The text is
+                attached as a file and the referenced source locations are named in the prompt.</li>
+            <li><b>让 Qoder CLI review 未提交的改动</b>: from the Tools menu or the Local Changes view,
+                ask the CLI to review your working copy. It runs <code>git diff</code> itself, so the
+                whole diff never has to be pasted anywhere.</li>
+        </ul>
+        新增 <b>问 Qoder CLI</b> 右键子菜单（编辑器与项目视图），内置任务：解释、审查、写测试、重构、补文档、
+        优化，另有“自定义…”，以及“继续当前会话”开关；文件或选中代码会作为上下文附件带入，CLI 以交互模式打开。
+        每个任务都是独立 action，可在 Find Action 搜索、在 Keymap 绑定快捷键。
+        <br/>
+        当 IDE 在当前文件（或选区）里报出 error / warning 时，子菜单里会多出“修报错”，把问题清单一并交给 CLI；
+        文件没问题时该项自动隐藏。
+        <br/>
+        在运行 / 调试控制台里右键可用“用 Qoder CLI 解释报错”，把选中的输出（或末尾若干行）作为附件交给 CLI
+        定位根因，提示语里会点名涉及的源码位置。
+        <br/>
+        在 Tools 菜单或 Local Changes 面板可以让 CLI review 未提交的改动，具体内容由它自己执行
+        <code>git diff</code> 获取，无需把 diff 粘来粘去。
+        <br/><br/>
         <b>1.0.0</b>
         <ul>
             <li>Initial release: one-click launch of the Qoder CLI in the IDE's embedded terminal,
@@ -48,17 +106,86 @@
     ]]></change-notes>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
     <depends>org.jetbrains.plugins.terminal</depends>
+    <!-- "让 Qoder CLI review 未提交的改动" is only registered where the IDE actually has VCS support. -->
+    <depends optional="true" config-file="qodercli-vcs.xml">com.intellij.modules.vcs</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Everything this plugin does happens in a terminal, so the rare failure that never gets
+             that far (e.g. a temp file that cannot be written) is reported as a balloon. -->
+        <notificationGroup id="Qoder CLI Launcher" displayType="BALLOON"/>
+    </extensions>
 
     <actions>
         <action id="LaunchQoderCli"
                 class="dev.linzhang.qodercli.LaunchQoderCliAction"
-                text="Launch Qoder CLI"
-                description="Open a terminal in the current directory and start the Qoder CLI (qodercli)"
+                text="启动 Qoder CLI"
+                description="在当前目录打开终端并启动 Qoder CLI（qodercli）"
                 icon="/icons/launchQoderCli.png">
             <!-- New UI main toolbar; absent in the Classic UI, hence the Tools menu fallback. -->
             <add-to-group group-id="MainToolbarRight" anchor="last"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+
+        <!-- Right-click a file in the editor or the Project view. The group's own title switches
+             between （当前文件）and（选中代码）; its entries are declared here so each one is a real
+             action, searchable in Find Action and bindable in Keymap. -->
+        <group id="AskQoderCliGroup"
+               class="dev.linzhang.qodercli.AskQoderCliActionGroup"
+               text="问 Qoder CLI"
+               popup="true"
+               icon="/icons/launchQoderCli.png">
+            <action id="QoderCliContinueSession"
+                    class="dev.linzhang.qodercli.ContinueSessionToggleAction"
+                    text="继续当前会话"
+                    description="勾选后，任务在已有的 Qoder CLI 会话里接着问；取消勾选则每次新开会话"/>
+            <separator/>
+            <action id="QoderCliAskFixProblems"
+                    class="dev.linzhang.qodercli.AskFixProblemsAction"
+                    text="修报错"
+                    description="把 IDE 在当前文件（或选区）报出的 error / warning 交给 Qoder CLI 修复"/>
+            <action id="QoderCliAskExplain"
+                    class="dev.linzhang.qodercli.AskExplainAction"
+                    text="解释"
+                    description="让 Qoder CLI 逐步解释这个文件（或选中的代码）"/>
+            <action id="QoderCliAskReview"
+                    class="dev.linzhang.qodercli.AskReviewAction"
+                    text="审查"
+                    description="让 Qoder CLI 找出 bug、边界情况和潜在隐患"/>
+            <action id="QoderCliAskWriteTests"
+                    class="dev.linzhang.qodercli.AskWriteTestsAction"
+                    text="写测试"
+                    description="让 Qoder CLI 为这个文件（或选中的代码）编写单元测试"/>
+            <action id="QoderCliAskRefactor"
+                    class="dev.linzhang.qodercli.AskRefactorAction"
+                    text="重构"
+                    description="让 Qoder CLI 给出可落地的重构建议"/>
+            <action id="QoderCliAskAddDocs"
+                    class="dev.linzhang.qodercli.AskAddDocsAction"
+                    text="补文档"
+                    description="让 Qoder CLI 补充文档注释"/>
+            <action id="QoderCliAskOptimize"
+                    class="dev.linzhang.qodercli.AskOptimizeAction"
+                    text="优化"
+                    description="让 Qoder CLI 给出性能优化建议"/>
+            <separator/>
+            <action id="QoderCliAskCustom"
+                    class="dev.linzhang.qodercli.AskCustomAction"
+                    text="自定义…"
+                    description="自己写一段提问，把这个文件（或选中的代码）交给 Qoder CLI"/>
+
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+        </group>
+
+        <action id="QoderCliExplainStackTrace"
+                class="dev.linzhang.qodercli.ExplainStackTraceAction"
+                text="用 Qoder CLI 解释报错"
+                description="把选中的控制台输出（或末尾若干行）交给 Qoder CLI 定位根因"
+                icon="/icons/launchQoderCli.png">
+            <!-- Right-click inside a Run / Debug console. -->
+            <add-to-group group-id="ConsoleEditorPopupMenu" anchor="first"/>
         </action>
     </actions>
 </idea-plugin>

@@ -1,0 +1,16 @@
+<!--
+  Loaded only when the IDE provides VCS support (optional dependency declared in plugin.xml), so
+  the plugin still installs on IDEs without it.
+-->
+<idea-plugin>
+    <actions>
+        <action id="QoderCliReviewChanges"
+                class="dev.linzhang.qodercli.ReviewChangesAction"
+                text="让 Qoder CLI review 未提交的改动"
+                description="让 Qoder CLI 自己执行 git diff，review 当前工作区里所有未提交的改动"
+                icon="/icons/launchQoderCli.png">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <add-to-group group-id="ChangesViewPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
