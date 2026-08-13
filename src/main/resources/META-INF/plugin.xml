@@ -1,71 +1,115 @@
 <idea-plugin>
     <id>dev.linzhang.qodercli-launcher</id>
     <name>Qoder CLI Launcher</name>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
     <vendor email="linzhang66666666@gmail.com"
             url="https://github.com/linyixiao/intellij-qodercli-launcher">Lin Zhang</vendor>
 
-    <idea-version since-build="251"/>
+    <idea-version since-build="242"/>
 
     <description><![CDATA[
-        <b>Qoder CLI Launcher</b> adds a toolbar button that opens a terminal tab named
-        "Qoder CLI" in the project root and runs the Qoder CLI
-        (<code>qodercli</code>). After the CLI exits, the tab drops back to an interactive
-        shell so it stays open for further use. Works on macOS, Linux and Windows.
+        <b>Qoder CLI Launcher</b> - launch the Qoder CLI (<code>qodercli</code>) inside your IDE
+        with one click.
         <br/><br/>
-        You can also right-click a file in the editor or the Project view and open the
-        <b>问 Qoder CLI</b> submenu to pick a task &mdash; 解释 (explain), 审查 (review),
-        写测试 (write tests), 重构 (refactor), 补文档 (add docs), 优化 (optimize), or 自定义…
-        (a free-form question). The chosen file (or selected snippet) is attached as context and the
-        CLI opens in interactive mode, ready for follow-up questions. A 继续当前会话
-        ("continue current session") toggle controls whether tasks continue in the existing terminal
-        session or always start a new one. The menu is in Chinese, matching the Qoder CLI itself.
+        Qoder CLI Launcher 让你在 IDE 里一键唤起 Qoder CLI（<code>qodercli</code>），并把你正在看的代码、
+        IDE 自己发现的问题、未提交的改动直接交给它处理——不用复制粘贴，不用来回切窗口。
         <br/><br/>
-        Where the IDE knows something a terminal agent cannot, the plugin hands it over.
-        <b>修报错</b> (fix the problems) appears in that same submenu whenever the current file or
-        selection carries errors or warnings, and passes the list along. <b>用 Qoder CLI 解释报错</b>
-        sends the selected output of a Run / Debug console &mdash; or its tail &mdash; for diagnosis.
-        <b>让 Qoder CLI review 未提交的改动</b> (Tools menu, or the Local Changes view) names the
-        files you have touched and lets the CLI run <code>git diff</code> itself.
-        <br/><br/>
-        <b>Prerequisites</b>
+        <b>功能一览</b>
         <ul>
-            <li>The Qoder CLI (<code>qodercli</code>) must be installed and available on your
-                <code>PATH</code> (the plugin only launches it, it does not bundle it).</li>
-            <li>An IntelliJ-based IDE with the bundled <b>Terminal</b> plugin enabled.</li>
-            <li>IDE version <b>2025.1 (build 251)</b> or newer (the terminal API this plugin relies on is not available in earlier builds).</li>
+            <li><b>一键启动</b>：工具栏按钮（或 <i>Tools | 启动 Qoder CLI</i>）在工程根目录打开名为
+                “Qoder CLI” 的终端标签页并运行 CLI；命令结束后回落到交互式 shell，标签页保留可继续使用。
+                支持 macOS、Linux 和 Windows。</li>
+            <li><b>问 Qoder CLI</b>：右键任意文件或选中代码挑选任务——解释、审查、写测试、重构、补文档、
+                优化，或“自定义…”自由提问。文件（或选区）自动作为上下文附件带入，CLI 以交互模式打开，可继续追问；
+                顶部的“继续当前会话”开关决定是接着已有会话问，还是每次新开。每个任务都是独立 action，
+                可在 Find Action 搜索、在 Keymap 绑定快捷键。</li>
+            <li><b>修报错</b>：当前文件（或选区）被 IDE 报出 error / warning 时自动出现在子菜单里，
+                把你正看着的那些波浪线整理成清单，直接交给 CLI 修复。</li>
+            <li><b>用 Qoder CLI 解释报错</b>：在运行 / 调试控制台里右键，把选中的输出（或末尾若干行）
+                交给 CLI 定位根因。</li>
+            <li><b>让 Qoder CLI review 未提交的改动</b>：Tools 菜单或 Local Changes 面板一键发起，
+                插件只点名改过的文件，具体 diff 由 CLI 自己执行 <code>git diff</code> 获取。</li>
+            <li><b>终端自己选</b>：<i>Settings | Tools | Qoder CLI Launcher</i> 里可指定会话开在哪里——
+                IDE 内置终端（默认）、iTerm2（macOS）、Ghostty（macOS / Linux）、系统默认终端
+                （macOS 的 Terminal.app / Windows 的 Windows Terminal / Linux 上探测到的第一个终端），
+                或任意自定义命令。</li>
         </ul>
         <br/>
-        This is an independent helper that launches the separately installed Qoder CLI.
-        <hr/>
-        <b>Qoder CLI Launcher</b> 会在工具栏添加一个按钮：在工程根目录打开一个名为
-        “Qoder CLI” 的终端标签页并运行 Qoder CLI（<code>qodercli</code>）。命令结束后会回落到
-        交互式 shell，标签页保持打开以便继续使用。支持 macOS、Linux 和 Windows。
-        <br/><br/>
-        你还可以在编辑器或项目视图中右键某个文件，打开 <b>问 Qoder CLI</b> 子菜单挑选任务
-        &mdash; 解释、审查、写测试、重构、补文档、优化，或“自定义…”自由提问。选中的文件（或选中的代码片段）
-        会作为上下文附件带入，CLI 以交互模式打开，便于继续追问。菜单里的“继续当前会话”开关用于控制
-        任务是在已有终端会话里接着问，还是每次都新开一个会话。每个任务都是独立的 action，可以在
-        Find Action 里搜到，也可以在 Keymap 里绑定快捷键。
-        <br/><br/>
-        凡是只有 IDE 才知道的信息，插件都会替你交给 CLI：当前文件（或选区）里有 error / warning 时，
-        子菜单里会多出 <b>修报错</b>，把问题清单一并带上；在运行 / 调试控制台里右键可用
-        <b>用 Qoder CLI 解释报错</b>，把选中的输出（或末尾若干行）交给 CLI 定位根因；
-        <b>让 Qoder CLI review 未提交的改动</b>（Tools 菜单或 Local Changes 面板）会点名你改过的文件，
-        具体 diff 由 CLI 自己执行 <code>git diff</code> 获取。
+        各终端的追问体验不完全一致：内置终端、iTerm2、Terminal.app 能回到原标签页接着问，
+        其余终端新开窗口接续上下文；推荐使用 IDE 内置终端。
         <br/><br/>
         <b>使用前提</b>
         <ul>
             <li>已安装 Qoder CLI（<code>qodercli</code>），且其在系统 <code>PATH</code> 中可直接调用
-                （本插件只负责启动，不内置 CLI 本体）。</li>
-            <li>基于 IntelliJ 的 IDE，并已启用内置的 <b>Terminal</b> 插件。</li>
-            <li>IDE 版本为 <b>2025.1（build 251）</b> 或更高（本插件依赖的终端 API 在更早版本中不存在）。</li>
+                （插件只负责启动，不内置 CLI 本体）。</li>
+            <li>基于 IntelliJ 的 IDE，已启用内置 <b>Terminal</b> 插件，版本 <b>2024.2（build 242）</b>及以上。</li>
+        </ul>
+        本插件是一个独立的辅助工具，只负责启动你单独安装好的 Qoder CLI。
+        <hr/>
+        <b>Qoder CLI Launcher</b> puts the Qoder CLI (<code>qodercli</code>) one click away inside your
+        IDE and hands it exactly what you are looking at &mdash; the current file, the problems the IDE
+        itself has found, your uncommitted changes &mdash; with no copy-pasting and no window switching.
+        <br/><br/>
+        <b>What it does</b>
+        <ul>
+            <li><b>One-click launch</b>: a toolbar button (or <i>Tools | 启动 Qoder CLI</i>) opens a
+                terminal tab named “Qoder CLI” at the project root and runs the CLI; after the command
+                exits, the tab drops back to an interactive shell and stays usable. Works on macOS,
+                Linux and Windows.</li>
+            <li><b>问 Qoder CLI (Ask Qoder CLI)</b>: right-click any file or selection and pick a task
+                &mdash; explain, review, write tests, refactor, add docs, optimize, or 自定义… (a
+                free-form question). The file (or snippet) is attached as context and the CLI opens in
+                interactive mode, ready for follow-up questions; the 继续当前会话 toggle decides whether
+                tasks continue in the existing session or start a new one. Every entry is a normal
+                action, searchable in Find Action and bindable in Keymap.</li>
+            <li><b>修报错 (fix the problems)</b>: appears in that submenu whenever the IDE reports
+                errors or warnings in the current file (or selection), and hands that very list &mdash;
+                the squiggles you are looking at &mdash; to the CLI.</li>
+            <li><b>用 Qoder CLI 解释报错 (explain errors)</b>: right-click inside a Run / Debug console
+                to send the selected output &mdash; or its tail &mdash; to the CLI for diagnosis.</li>
+            <li><b>让 Qoder CLI review 未提交的改动 (review uncommitted changes)</b>: from the Tools
+                menu or the Local Changes view; the plugin names the files you touched and the CLI runs
+                <code>git diff</code> itself.</li>
+            <li><b>Choose your terminal</b>: <i>Settings | Tools | Qoder CLI Launcher</i> picks where
+                sessions open &mdash; the IDE's built-in terminal (default), iTerm2 (macOS), Ghostty
+                (macOS / Linux), the system terminal (Terminal.app on macOS, Windows Terminal on
+                Windows, or the first emulator found on Linux), or any custom command.</li>
         </ul>
         <br/>
-        本插件是一个独立的辅助工具，用于启动你单独安装好的 Qoder CLI。
+        Follow-up behaviour varies by terminal: the built-in terminal, iTerm2 and Terminal.app return
+        to the original tab, while the others resume the conversation in a new window. The built-in
+        terminal is recommended.
+        <br/><br/>
+        <b>Prerequisites</b>
+        <ul>
+            <li>The Qoder CLI (<code>qodercli</code>) installed and available on your <code>PATH</code>
+                (the plugin only launches it, it does not bundle it).</li>
+            <li>An IntelliJ-based IDE with the bundled <b>Terminal</b> plugin enabled, version
+                <b>2024.2 (build 242)</b> or newer.</li>
+        </ul>
+        This is an independent helper that launches the separately installed Qoder CLI.
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.3.0</b>
+        <ul>
+            <li><b>Rewritten listing</b>: the Marketplace description is now bilingual with the Chinese
+                section first, opens with a one-line value proposition followed by a clear feature
+                list, and finally documents what was missing before &mdash; that
+                <i>Settings | Tools | Qoder CLI Launcher</i> chooses where sessions open (built-in
+                terminal, iTerm2, Ghostty, the system terminal, or a custom command). The README is
+                reordered the same way.</li>
+            <li><b>Wider compatibility</b>: the compatibility floor drops from 2025.1 (build 251) to
+                2024.2 (build 242). The only API that needed 251 &mdash; the terminal's
+                "is a command still running" check &mdash; is now probed at runtime; on older IDEs,
+                where it does not exist, follow-up questions are typed into the existing session
+                directly, which is what a still-open interactive CLI expects.</li>
+        </ul>
+        重写了插件介绍。
+        <br/>
+        兼容下限从 2025.1（build 251）放宽到 2024.2（build 242）：唯一需要 251 的终端 API
+        （“命令是否还在运行”）改为运行时探测。
+        <br/><br/>
         <b>1.2.0</b>
         <ul>
             <li><b>External terminals</b>: <i>Settings | Tools | Qoder CLI Launcher</i> can now start
