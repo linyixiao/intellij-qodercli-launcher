@@ -14,6 +14,7 @@ import org.jetbrains.plugins.terminal.TerminalToolWindowManager;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -145,14 +146,7 @@ final class QoderCliLauncher {
         // then hop back to the EDT to touch the terminal / tool window, which must happen on the EDT.
         final TerminalWidget widget = reuse;
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            boolean running;
-            try {
-                running = widget.isCommandRunning();
-            } catch (Throwable t) {
-                // If the state can't be determined, prefer the --continue relaunch path.
-                running = false;
-            }
-            final boolean isRunning = running;
+            final boolean isRunning = commandRunning(widget);
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (project.isDisposed()) {
                     return;
@@ -234,6 +228,30 @@ final class QoderCliLauncher {
     // ---------------------------------------------------------------------------------------------
     // Reuse bookkeeping
     // ---------------------------------------------------------------------------------------------
+
+    /**
+     * Whether the CLI is still running in {@code widget}, probed by reflection.
+     *
+     * <p>{@code TerminalWidget.isCommandRunning()} only exists since build 251. Calling it
+     * directly would bake an unresolvable method reference into the bytecode and fail verification
+     * against 242, the oldest build this plugin supports, so it is looked up at runtime instead.
+     * On older IDEs the method is absent and the caller assumes the interactive CLI is still up —
+     * its normal state — and types the task into the session directly.
+     */
+    private static boolean commandRunning(@NotNull TerminalWidget widget) {
+        try {
+            Method method = widget.getClass().getMethod("isCommandRunning");
+            return Boolean.TRUE.equals(method.invoke(widget));
+        } catch (NoSuchMethodException e) {
+            // Pre-251 IDE: the API does not exist there. Assume the interactive CLI is still up —
+            // it normally is, since interactive qodercli does not return to the shell between
+            // questions — so the caller types the task into the session directly.
+            return true;
+        } catch (Throwable t) {
+            // If the state can't be determined, prefer the --continue relaunch path.
+            return false;
+        }
+    }
 
     private static void track(@NotNull Project project, @NotNull TerminalWidget widget) {
         synchronized (TRACKED) {
