@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>dev.linzhang.qodercli-launcher</id>
     <name>Qoder CLI Launcher</name>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <vendor email="linzhang66666666@gmail.com"
             url="https://github.com/linyixiao/intellij-qodercli-launcher">Lin Zhang</vendor>
 
@@ -9,7 +9,7 @@
 
     <description><![CDATA[
         <b>Qoder CLI Launcher</b> adds a toolbar button that opens a terminal tab named
-        "Qoder CLI" in the current file's directory and runs the Qoder CLI
+        "Qoder CLI" in the project root and runs the Qoder CLI
         (<code>qodercli</code>). After the CLI exits, the tab drops back to an interactive
         shell so it stays open for further use. Works on macOS, Linux and Windows.
         <br/><br/>
@@ -38,7 +38,7 @@
         <br/>
         This is an independent helper that launches the separately installed Qoder CLI.
         <hr/>
-        <b>Qoder CLI Launcher</b> 会在工具栏添加一个按钮：在当前文件所在目录打开一个名为
+        <b>Qoder CLI Launcher</b> 会在工具栏添加一个按钮：在工程根目录打开一个名为
         “Qoder CLI” 的终端标签页并运行 Qoder CLI（<code>qodercli</code>）。命令结束后会回落到
         交互式 shell，标签页保持打开以便继续使用。支持 macOS、Linux 和 Windows。
         <br/><br/>
@@ -66,6 +66,30 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <b>1.2.0</b>
+        <ul>
+            <li><b>External terminals</b>: <i>Settings | Tools | Qoder CLI Launcher</i> can now start
+                sessions in iTerm2 (macOS), Ghostty (macOS and Linux), the system terminal
+                (Terminal.app, Windows Terminal, or the first emulator found on Linux), or a custom
+                command of your own. On macOS follow-up questions go back to the very tab the plugin
+                opened in iTerm2 or Terminal.app, just like in the embedded terminal; in Ghostty and
+                on other platforms they open a new window and resume with <code>--continue</code>.
+                The embedded terminal remains the default; if an external one cannot be started, the
+                session falls back to it and a notification explains why.</li>
+            <li><b>Launch in the project root</b>: the toolbar button and <i>Tools | 启动 Qoder
+                CLI</i> now start the session at the project root rather than in the directory of
+                whichever file is open, so the CLI sees the whole project and keeps one session
+                history instead of one per subdirectory. Right-click tasks are unaffected.</li>
+        </ul>
+        新增 <i>Settings | Tools | Qoder CLI Launcher</i> 设置项，可选择在 iTerm2（macOS）、Ghostty（macOS /
+        Linux）、系统默认终端（Terminal.app / Windows Terminal / Linux 上探测到的第一个终端）或自定义命令中启动会话；
+        在 macOS 上，iTerm2 与 Terminal.app 的追问会回到本插件开的那个标签页，与内置终端一致，Ghostty
+        与其他平台则新开窗口并用 <code>--continue</code> 接上上下文。默认仍是 IDE
+        内置终端，外部终端启动失败时会提示原因并自动回落到内置终端。
+        <br/>
+        工具栏按钮与 <i>Tools | 启动 Qoder CLI</i> 改为在工程根目录启动，不再跟着当前打开的文件走到子目录，
+        CLI 因此能看到整个工程，会话历史也不会按子目录散成多份；右键菜单里的任务不受影响。
+        <br/><br/>
         <b>1.1.0</b>
         <ul>
             <li><b>问 Qoder CLI</b> context-menu submenu (editor &amp; Project view) with preset tasks
@@ -112,8 +136,14 @@
     <depends optional="true" config-file="qodercli-vcs.xml">com.intellij.modules.vcs</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Everything this plugin does happens in a terminal, so the rare failure that never gets
-             that far (e.g. a temp file that cannot be written) is reported as a balloon. -->
+        <!-- Settings | Tools | Qoder CLI Launcher — choose the embedded terminal or an external one. -->
+        <applicationConfigurable id="dev.linzhang.qodercli.settings"
+                                 parentId="tools"
+                                 instance="dev.linzhang.qodercli.QoderCliConfigurable"
+                                 displayName="Qoder CLI Launcher"/>
+        <!-- Everything this plugin does happens in a terminal, so anything that never gets that far
+             — a temp file that cannot be written, an external terminal that refuses to start — is
+             reported as a balloon rather than silently doing nothing. -->
         <notificationGroup id="Qoder CLI Launcher" displayType="BALLOON"/>
     </extensions>
 
@@ -121,7 +151,7 @@
         <action id="LaunchQoderCli"
                 class="dev.linzhang.qodercli.LaunchQoderCliAction"
                 text="启动 Qoder CLI"
-                description="在当前目录打开终端并启动 Qoder CLI（qodercli）"
+                description="在工程根目录打开终端并启动 Qoder CLI（qodercli）"
                 icon="/icons/launchQoderCli.png">
             <!-- New UI main toolbar; absent in the Classic UI, hence the Tools menu fallback. -->
             <add-to-group group-id="MainToolbarRight" anchor="last"/>
