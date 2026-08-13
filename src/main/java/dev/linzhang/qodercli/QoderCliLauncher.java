@@ -79,6 +79,18 @@ final class QoderCliLauncher {
                          @NotNull String injectMessage) {
         boolean continueSession = ContinueSessionToggleAction.isContinueSession();
 
+        if (QoderCliSettings.effectiveMode() != QoderCliSettings.Mode.BUILT_IN) {
+            // The external launcher decides for itself how far it can reuse a window — typing into
+            // the session it opened where the terminal can be scripted, and falling back to a new
+            // window plus --continue where it cannot.
+            if (continueSession) {
+                ExternalTerminalLauncher.continueSession(project, workingDir, args, injectMessage);
+            } else {
+                ExternalTerminalLauncher.launch(project, workingDir, args);
+            }
+            return;
+        }
+
         if (continueSession) {
             launchAsk(project, workingDir, args, injectMessage);
         } else {
@@ -95,7 +107,11 @@ final class QoderCliLauncher {
                        @NotNull String workingDir,
                        @NotNull String tabName,
                        @NotNull List<String> qoderCliArgs) {
-        launchNew(project, workingDir, tabName, qoderCliArgs);
+        if (QoderCliSettings.effectiveMode() != QoderCliSettings.Mode.BUILT_IN) {
+            ExternalTerminalLauncher.launch(project, workingDir, qoderCliArgs);
+            return;
+        }
+        launchInBuiltIn(project, workingDir, tabName, qoderCliArgs);
     }
 
     /**
@@ -120,7 +136,7 @@ final class QoderCliLauncher {
         TerminalWidget reuse = findReusable(project);
         if (reuse == null) {
             // Route (3): nothing to reuse — fresh session (we are already on the EDT here).
-            launchNew(project, workingDir, TAB_NAME, qoderCliArgs);
+            launchInBuiltIn(project, workingDir, TAB_NAME, qoderCliArgs);
             return;
         }
 
@@ -144,7 +160,7 @@ final class QoderCliLauncher {
                 // The user may have closed the tab during the background hop; if so, don't touch a
                 // dead widget — open a fresh session instead.
                 if (!isTracked(project, widget)) {
-                    launchNew(project, workingDir, TAB_NAME, qoderCliArgs);
+                    launchInBuiltIn(project, workingDir, TAB_NAME, qoderCliArgs);
                     return;
                 }
                 activate(project, widget);
@@ -167,12 +183,14 @@ final class QoderCliLauncher {
     }
 
     /**
-     * Open a brand-new terminal tab running qodercli, and remember it for later reuse.
+     * Open a brand-new tab in the IDE's own terminal running qodercli, and remember it for later
+     * reuse. This bypasses the terminal-mode setting on purpose: it is both the built-in path and
+     * the fallback used when an external terminal could not be started.
      */
-    private static void launchNew(@NotNull Project project,
-                                  @NotNull String workingDir,
-                                  @NotNull String tabName,
-                                  @NotNull List<String> qoderCliArgs) {
+    static void launchInBuiltIn(@NotNull Project project,
+                                @NotNull String workingDir,
+                                @NotNull String tabName,
+                                @NotNull List<String> qoderCliArgs) {
         // createShellWidget opens a regular interactive shell tab (rc files loaded, and the tab
         // drops back to the prompt when qodercli exits). It is deprecated but public and not marked
         // for removal, unlike the internal createNewSession(..., command, ...) overload.
@@ -320,8 +338,22 @@ final class QoderCliLauncher {
                 : arg.replace('\r', ' ').replace('\n', ' ');
     }
 
-    private static boolean isWindows() {
-        return System.getProperty("os.name", "").toLowerCase(Locale.ROOT).contains("win");
+    static boolean isWindows() {
+        return osName().contains("win");
+    }
+
+    /** macOS is the only platform where the AppleScript-driven launchers make sense. */
+    static boolean isMac() {
+        return osName().contains("mac");
+    }
+
+    /** Neither macOS nor Windows — where Ghostty and the emulator probe apply. */
+    static boolean isLinux() {
+        return !isWindows() && !isMac();
+    }
+
+    private static String osName() {
+        return System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
     }
 
     /**
