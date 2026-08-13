@@ -3,8 +3,8 @@
 An IntelliJ Platform plugin that adds a toolbar button to launch the
 [Qoder CLI](https://qoder.com) (`qodercli`) in the IDE's embedded terminal.
 
-Clicking the button opens a terminal tab named **Qoder CLI** in the current
-file's directory and runs `qodercli`. After the CLI exits, the tab drops back
+Clicking the button opens a terminal tab named **Qoder CLI** in the project root
+and runs `qodercli`. After the CLI exits, the tab drops back
 to an interactive shell so it stays open for further use. Works on macOS, Linux
 and Windows.
 
@@ -41,6 +41,26 @@ Three entries hand the CLI something it cannot see from a terminal:
   Changes view. It tells the CLI which files you touched and lets it run
   `git diff` itself, so no diff is ever pasted around.
 
+## Where sessions open
+
+By default every session lands in the IDE's own terminal tool window. That is a
+narrow strip, which is the wrong shape for a CLI you are going to talk to for an
+hour, so **Settings → Tools → Qoder CLI Launcher** lets you send sessions
+elsewhere: **iTerm2** (macOS), **Ghostty** (macOS and Linux), the **system
+terminal** (Terminal.app, Windows Terminal, or the first emulator found on
+Linux), or a **custom command** of your own.
+
+On macOS follow-up questions go back to the very tab the plugin opened in iTerm2
+or Terminal.app — their sessions have stable ids and ttys — so those terminals
+behave like the embedded one. Ghostty cannot be scripted after the fact, so
+there (and on other platforms) a follow-up opens a new window and resumes the
+conversation with `--continue`.
+
+The first launch into Terminal.app or iTerm2 asks for macOS automation
+permission. If that is denied, or the emulator is missing, or a custom command
+does not run, the session simply opens in the embedded terminal and a
+notification says why.
+
 This is an independent helper that only *launches* a separately installed Qoder
 CLI — it does not bundle the CLI itself.
 
@@ -69,7 +89,7 @@ point the build at it explicitly:
 ```
 
 The installable plugin zip is produced at
-`build/distributions/qodercli-launcher-1.1.0.zip`.
+`build/distributions/qodercli-launcher-1.2.0.zip`.
 
 On macOS/Linux, if `./gradlew` fails with *Permission denied*, restore the
 executable bit once with `chmod +x gradlew`.
@@ -90,7 +110,7 @@ Released under the [MIT License](LICENSE).
 一个基于 IntelliJ 平台的插件，在工具栏添加一个按钮，用于在 IDE 内置终端中启动
 [Qoder CLI](https://qoder.com)（`qodercli`）。
 
-点击按钮会在当前文件所在目录打开一个名为 **Qoder CLI** 的终端标签页并运行
+点击按钮会在工程根目录打开一个名为 **Qoder CLI** 的终端标签页并运行
 `qodercli`；命令结束后回落到交互式 shell，标签页保持打开以便继续使用。支持
 macOS、Linux 和 Windows。
 
@@ -116,6 +136,20 @@ macOS、Linux 和 Windows。
 - **让 Qoder CLI review 未提交的改动**：位于 Tools 菜单和 Local Changes 面板。插件只告诉 CLI
   哪些文件改了，具体内容由它自己执行 `git diff` 获取，无需把 diff 粘来粘去。
 
+## 会话开在哪里
+
+默认情况下会话都开在 IDE 内置终端的工具窗口里。那是一条窄条，对于要聊上一小时的 CLI
+并不合适，所以 **Settings → Tools → Qoder CLI Launcher** 里可以改成别处：**iTerm2**
+（macOS）、**Ghostty**（macOS / Linux）、**系统默认终端**（Terminal.app / Windows
+Terminal / Linux 上探测到的第一个终端），或者你自己的**自定义命令**。
+
+在 macOS 上，iTerm2 与 Terminal.app 的追问会回到本插件开的那个标签页——它们的会话分别有
+稳定的 id 与 tty——用起来和内置终端一致；Ghostty 没有可供事后操作的接口，因此在那里
+（以及其他平台上）追问会新开一个窗口，用 `--continue` 接上上下文。
+
+首次启动 Terminal.app 或 iTerm2 时，macOS 会弹出自动化权限申请。若被拒绝、终端没装，
+或自定义命令跑不起来，会话会直接回落到内置终端，并弹出通知说明原因。
+
 本插件是一个独立的辅助工具，只负责**启动**你单独安装好的 Qoder CLI，不内置 CLI 本体。
 
 ## 使用前提
@@ -140,7 +174,7 @@ macOS、Linux 和 Windows。
 # 或：export IDEA_HOME="/path/to/idea"
 ```
 
-产物 zip 位于 `build/distributions/qodercli-launcher-1.1.0.zip`。
+产物 zip 位于 `build/distributions/qodercli-launcher-1.2.0.zip`。
 
 在 macOS/Linux 上，若 `./gradlew` 报 *Permission denied*，执行一次
 `chmod +x gradlew` 补上可执行权限即可。
